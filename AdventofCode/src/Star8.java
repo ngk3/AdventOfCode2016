@@ -2,19 +2,18 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public class Star7 {
-	
+public class Star8 {
+
 	/*
 	 * For visualization:
 	 * 	aaaaa-bbb-z-y-x-123[abxyz] is a real room because the most common letters are a (5), b (3), and then a tie between x, y, and z, which are listed alphabetically.
 	 */
 	
-	public static int sum_sector_ids = 0; 
+	public static int sum_sector_ids = 0;
 	
 	// Function used to read the file and get the results
 	public static void read_input(String file_name) {
@@ -32,15 +31,43 @@ public class Star7 {
 					encrypt += splitted[i];
 				
 				// Check if the room is real or a decoy and if the room is real...
-				if (check_match(encrypt, splitted[splitted.length - 1]))
+				if (check_match(encrypt, splitted[splitted.length - 1])) {
 					// Add into the sum of sector ids
 					sum_sector_ids += Integer.parseInt(splitted[splitted.length - 2]);
+					
+					// Translate the String and check if it is the NORTHPOLE room
+					String temp = "";
+					for(int i = 0; i < splitted.length - 2; i++) {
+						temp += translation(splitted[i], Integer.parseInt(splitted[splitted.length - 2]));
+						temp += " ";
+					}
+					if (temp.contains("NORTH"))
+						System.out.println(temp + "= " + splitted[splitted.length - 2]);
+				}
 			}
 			
 			br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	// Function that rotates encrypt rotation letters forward with wrap-around
+	public static String translation(String encrypt, int rotation) {
+		// Get the numerical representation of each character in encrypt and rotate to its final destination
+		Integer[] encrypt_to_int = new Integer[encrypt.length()];
+		for (int i = 0; i < encrypt.length(); i++) {
+			int new_value = Character.getNumericValue(encrypt.charAt(i)) - 10 + (rotation % 26);
+			if (new_value > 25)
+				new_value -= 26;
+			encrypt_to_int[i] = new_value;
+		}
+		
+		// Create the string from the rotation and return it 
+		String result = "";
+		for (int i = 0; i < encrypt.length(); i++)
+			result += (char) (encrypt_to_int[i] + 65);
+		return result;
 	}
 	
 	// Function that finds the five most common letters in a String
@@ -103,9 +130,8 @@ public class Star7 {
 	// Function to return the sum of the sector ids found
 	public static int get_sum_sector_ids() {return sum_sector_ids;}
 	
-	public static void main(String[] argvs) {
+	public static void main(String[] args) 
+	{	
 		read_input("Star7_input.txt");
-		System.out.println(get_sum_sector_ids());
 	}
 }
-	
