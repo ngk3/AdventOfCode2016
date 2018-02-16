@@ -4,9 +4,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 
-public class Star27 {	
+public class Star28 {	
 	
 	//Function used to get the MD5 Hash of a String. Taken from "http://www.asjava.com/core-java/java-md5-example/"
 	public static String getMD5(String input) {
@@ -29,23 +28,24 @@ public class Star27 {
 	// Function that gets the key_num hash index given a salt and the key_num
 	public int getKeyIndex(String salt, int key_num) {
 		HashMap<Integer, String> triples = new HashMap<Integer, String>();
-		int countKeys = 0;
 		int tracker = 0;
+		ArrayList<Integer> key_indices = new ArrayList<Integer>();
 		
-		while (true) {		
+		while (key_indices.size() < key_num) {
 			String hash = getMD5(salt + tracker);
-			
+			for (int i = 0; i < 2016; i++)
+				hash = getMD5(hash);
+
 			// if a quintuple is found, check if any hashes are valid. Return when key_num hash is found
 			if (checkFive(hash)) {
 				String quin_char = getFiveCharacter(hash);
 				ArrayList<Integer> sortedKeysList = new ArrayList<Integer>(triples.keySet());
-				Collections.sort(sortedKeysList);
 				for (Integer i : sortedKeysList) {
-					if (triples.get(i).equals(quin_char)) {
-						if (countKeys == key_num - 1)
-							return i;
-						countKeys++;
+					if (i + 1000 <= tracker)
 						triples.remove(i);
+					else if (triples.get(i).equals(quin_char)) {
+						triples.remove(i);
+						key_indices.add(i);
 					}
 				}
 				triples.put(tracker, quin_char);
@@ -55,14 +55,11 @@ public class Star27 {
 			else if (checkTriple(hash)) {
 				triples.put(tracker, getTripleCharacter(hash));
 			}
-			
-			// Remove any hash that has not been found and has passed 1000 mark
-			for (Integer i : new HashSet<Integer>(triples.keySet())) {
-				if (i + 1000 < tracker)
-					triples.remove(i);
-			}
 			tracker++;
 		}
+		
+		Collections.sort(key_indices);
+		return key_indices.get(key_num - 1);
 	}
 
 	// Function that checks if the String has a triple in it
@@ -90,7 +87,7 @@ public class Star27 {
 	}
 
 	public static void main(String[] argvs) {
-		Star27 pgm = new Star27();
+		Star28 pgm = new Star28();
 		System.out.println("Index to get the 64th key = " + pgm.getKeyIndex("yjdafjpo", 64));
 	}
 	

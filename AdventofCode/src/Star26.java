@@ -3,8 +3,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class Star25 {
-	// Part 1 Answer = 82	
+public class Star26 {
+	// Part 1 Answer = 138
 	
 	// Function to find the number of bits that are 1 in the binary representative of calculation
 	public int calcBinaryNumberofOnes(int calculation) {
@@ -26,8 +26,8 @@ public class Star25 {
 			return true;
 	}
 
-	// function used to get the fewest steps to get to (endx, endy) from (1,1) using a bfs
-	public int getFewestSteps(int end_x, int end_y, int fav_num) {	
+	// Function to get the number of coordinates visit-able within num_steps steps
+	public int getCoordinatesVisited(int num_steps, int fav_num) {	
 		// Setup the queue and visited
 		Queue<ArrayList<String>> queue = new LinkedList<ArrayList<String>>();
 		ArrayList<String> start = new ArrayList<String>();
@@ -36,16 +36,15 @@ public class Star25 {
 		
 		HashSet<String> visited = new HashSet<String>();
 		
-		// If queue is empty, no path is found...
 		while (queue.size() > 0) {
 			// Get the path traveled thus far
 			ArrayList<String> popped_list = queue.poll();
+			
+			// Since this is a bfs, the first time a path is found > num_steps + 1 (accounting 1,1), all paths within num_steps have been visited
+			if (popped_list.size() > num_steps + 1)
+				return visited.size();
+			
 			String popped = popped_list.get(popped_list.size() - 1);
-			
-			// If destination has been reached, return the number of steps taken
-			if (popped.equals(end_x + "," + end_y))
-				return popped_list.size() - 1;
-			
 			// If previously visited, continue
 			if (visited.contains(popped))
 				continue;
@@ -75,9 +74,9 @@ public class Star25 {
 		
 		return -1;
 	}
-
+	
 	public static void main(String[] argvs) {
-		Star25 pgm = new Star25();
-		System.out.println("Fewest steps to get to (31,39) = " + pgm.getFewestSteps(31,39,1362));
+		Star26 pgm = new Star26();
+		System.out.println("Fewest steps to get to (31,39) = " + pgm.getCoordinatesVisited(50, 1362));
 	}
 }
